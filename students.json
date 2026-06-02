@@ -1,0 +1,28 @@
+{
+  "students": [
+    {
+      "name": "chad",
+      "uuid_domain": "bchd.0e5c8941-0db1-4a2b-9439-401a325a2137",
+      "first_accessed": "2026-06-02T16:06:03Z",
+      "last_accessed": "2026-06-02T16:06:03Z",
+      "payload": "# PCDS config for chad (bchd.0e5c8941-0db1-4a2b-9439-401a325a2137)\nexport FUNNY=\"butts\"\nexport ARM_CLIENT_ID=\"11111111-1111-1111-1111-111111111111\"\nexport ARM_CLIENT_SECRET=\"superSecret123!\"\nexport ARM_RESOURCE_GROUP=\"rg-student-01\"\nexport ARM_SUBSCRIPTION_ID=\"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\"\nexport ARM_TENANT_ID=\"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb\"\n",
+      "csv_row_index": 0
+    },
+    {
+      "name": "is",
+      "uuid_domain": "bchd.65873ca1-e8be-4428-b105-aa3e0ba2ec5e",
+      "first_accessed": "2026-06-02T16:06:07Z",
+      "last_accessed": "2026-06-02T16:06:07Z",
+      "payload": "# PCDS config for is (bchd.65873ca1-e8be-4428-b105-aa3e0ba2ec5e)\nexport FUNNY=\"butts\"\nexport ARM_CLIENT_ID=\"22222222-2222-2222-2222-222222222222\"\nexport ARM_CLIENT_SECRET=\"superSecret456!\"\nexport ARM_RESOURCE_GROUP=\"rg-student-02\"\nexport ARM_SUBSCRIPTION_ID=\"cccccccc-cccc-cccc-cccc-cccccccccccc\"\nexport ARM_TENANT_ID=\"dddddddd-dddd-dddd-dddd-dddddddddddd\"\n",
+      "csv_row_index": 1
+    },
+    {
+      "name": "cool",
+      "uuid_domain": "bchd.c2af2850-f31d-42f3-9b40-37b32f1824b5",
+      "first_accessed": "2026-06-02T16:06:11Z",
+      "last_accessed": "2026-06-02T16:06:11Z",
+      "payload": "# PCDS config for cool (bchd.c2af2850-f31d-42f3-9b40-37b32f1824b5)\nexport FUNNY=\"butts\"\nexport ARM_CLIENT_ID=\"33333333-3333-3333-3333-333333333333\"\nexport ARM_CLIENT_SECRET=\"superSecret789!\"\nexport ARM_RESOURCE_GROUP=\"rg-student-03\"\nexport ARM_SUBSCRIPTION_ID=\"eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee\"\nexport ARM_TENANT_ID=\"ffffffff-ffff-ffff-ffff-ffffffffffff\"\n",
+      "csv_row_index": 2
+    }
+  ]
+}
