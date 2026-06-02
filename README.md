@@ -60,7 +60,23 @@ bbb-222,s3cr3t2,rg-student-02
 <details>
 <summary><strong>Teaching the Terraform on Azure course? Click here for instructions on how to get this data and format it.</strong></summary>
 
-> **Placeholder** — instructions for acquiring Azure service principal credentials and resource group names, and formatting them as a CSV for this tool, will go here.
+## Azure Student Environment Provisioner
+
+This script automates creating and tearing down per-student Azure resource groups for the Terraform Azure course.
+
+**What it does:**
+- Installs the Azure CLI if not already present
+- Walks you through authenticating to the Alta3 Azure account
+- Creates one resource group and scoped service principal per student, then writes credentials to a CSV
+- The generated CSV is what gets pasted into the PCDS dashboard
+
+**Run it on BCHD and follow the prompts:**
+
+```bash
+curl -fsSL https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh | bash
+```
+
+At the end of the course, run the script again and select the `Delete` option to tear down all rg-student-* resource groups and any infrastructure students left behind.
 
 </details>
 
