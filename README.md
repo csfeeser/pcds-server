@@ -28,11 +28,7 @@ fi
 # Build the binary
 make build
 
-# Bake your FQDN into the student setup script and publish it via nginx
-sed -i "s/REPLACE_WITH_INSTRUCTOR_FQDN/$(hostname --fqdn)/" client_setup.sh
-sudo cp client_setup.sh /var/www/static/setup.sh
-
-# Start the server
+# Start the server (automatically injects your FQDN into the setup script)
 ./pcds-server
 ```
 
@@ -94,7 +90,7 @@ pkill pcds-server
 Students run one command:
 
 ```bash
-source <(curl -s http://<INSTRUCTOR_FQDN>:8080/setup.sh)
+source <(curl -s http://<INSTRUCTOR_FQDN>:2225/setup.sh)
 ```
 
 They enter their name when prompted. Their shell is configured immediately and the variables persist in all future terminal sessions. If a student runs the command again (e.g. after a crash or reset), they receive the same credentials they were originally assigned.
@@ -105,8 +101,8 @@ They enter their name when prompted. Their shell is configured immediately and t
 
 | Port | Purpose |
 |---|---|
-| 2225 | PCDS server — student config requests and instructor dashboard |
-| 8080 | nginx — distributes `setup.sh` to students |
+| 2225 | PCDS server — student config requests, instructor dashboard, and `setup.sh` distribution |
+| 8080 | nginx — no longer needed for PCDS |
 
 ---
 
@@ -114,6 +110,7 @@ They enter their name when prompted. Their shell is configured immediately and t
 
 | Method | Path | Description |
 |---|---|---|
+| `GET`  | `/setup.sh`   | Student setup script with instructor FQDN pre-injected |
 | `POST` | `/get-config` | Student registration — returns `export` lines for the shell |
 | `GET` | `/roster` | Plain-text roster with slot usage (curl-friendly) |
 | `POST` | `/config` | Save instructor configuration |

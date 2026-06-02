@@ -14,6 +14,7 @@ import (
 )
 
 var cachedHTML string
+var cachedSetupSh string
 
 const (
 	dbPath     = "students.json"
@@ -422,6 +423,19 @@ func handleRoster(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleSetupScript(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if cachedSetupSh == "" {
+		http.Error(w, "setup script not available", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "text/x-shellscript")
+	fmt.Fprint(w, cachedSetupSh)
+}
+
 func handleReset(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -473,11 +487,26 @@ func main() {
 	}
 	cachedHTML = strings.ReplaceAll(dashboardHTML, "{{FQDN}}", fqdn)
 
+	if src, err := os.ReadFile("client_setup.sh"); err == nil {
+		lines := strings.Split(string(src), "\n")
+		for i, line := range lines {
+			if strings.HasPrefix(strings.TrimSpace(line), "INSTRUCTOR_FQDN=") {
+				lines[i] = `INSTRUCTOR_FQDN="` + fqdn + `"`
+				break
+			}
+		}
+		cachedSetupSh = strings.Join(lines, "\n")
+		log.Printf("setup.sh ready (FQDN: %s)", fqdn)
+	} else {
+		log.Printf("WARN: could not read client_setup.sh: %v", err)
+	}
+
 	http.HandleFunc("/", handleDashboard)
 	http.HandleFunc("/config", handleConfigSave)
 	http.HandleFunc("/config-data", handleConfigData)
 	http.HandleFunc("/get-config", handleGetConfig)
 	http.HandleFunc("/roster", handleRoster)
+	http.HandleFunc("/setup.sh", handleSetupScript)
 	http.HandleFunc("/reset", handleReset)
 	http.HandleFunc("/events", handleEvents)
 	log.Printf("PCDS listening on %s", port)
@@ -699,7 +728,7 @@ td.time { color: #718096; font-size: 0.8rem; }
     <h2>Student Setup Command</h2>
     <p class="hint">Ask students to run this in their terminal. They&#39;ll be prompted for their name.</p>
     <div class="cmd-box">
-      <code id="setup-cmd">source &lt;(curl -s http://{{FQDN}}:8080/setup.sh)</code>
+      <code id="setup-cmd">source &lt;(curl -s http://{{FQDN}}:2225/setup.sh)</code>
       <button id="btn-copy" onclick="copyCmd()">Copy</button>
     </div>
   </div>
