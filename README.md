@@ -28,8 +28,9 @@ fi
 # Build the binary
 make build
 
-# Start the server (automatically injects your FQDN into the setup script)
-./pcds-server
+# Start the server in background (automatically injects your FQDN into the setup script)
+nohup ./pcds-server > ~/pcds-server/pcds-server.log 2>&1 &
+echo "Server started with PID $!"
 ```
 
 The server runs on port **2225** and is viewable in **aux2**.
