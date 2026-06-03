@@ -73,7 +73,8 @@ This script automates creating and tearing down per-student Azure resource group
 **Run it on BCHD and follow the prompts:**
 
 ```bash
-curl -fsSL https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh | bash
+curl -fsSL https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh -o provision.sh
+bash provision.sh
 ```
 
 At the end of the course, run the script again and select the `Delete` option to tear down all rg-student-* resource groups and any infrastructure students left behind.
