@@ -1,136 +1,39 @@
-# PCDS — Pluggable Configuration Distribution Server
+# PCDS — Student Credential Handout
 
-A lightweight Go server that runs on an instructor VM and distributes personalized environment variables to students at the start of a lab. No accounts, no passwords — students are identified by their VM's unique domain name and get a consistent set of credentials every time they run the setup command.
+A single Python script (standard library only, Python 3.8+) that serves the Azure credentials created by
+[`provision_students.sh`](https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh)
+as a page with one button per student. Clicking a button copies a shell block to your clipboard and grays the
+button out, so you can see which ones you've already handed out. Paste the block into that student's terminal.
 
----
-
-## Setup
-
-Run this block once on the instructor VM. It installs dependencies, builds the binary, and starts the server.
+## Run it
 
 ```bash
-# Install git if needed
-sudo apt-get install -y git
-
-# Clone the repo
 git clone https://github.com/csfeeser/pcds-server.git ~/pcds-server
 cd ~/pcds-server
-
-# Install Go if needed
-if ! command -v go &>/dev/null; then
-  wget -q https://go.dev/dl/go1.22.4.linux-amd64.tar.gz
-  sudo rm -rf /usr/local/go
-  sudo tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz
-  echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-  source ~/.bashrc
-fi
-
-# Build the binary
-make build
-
-# Start the server in background (automatically injects your FQDN into the setup script)
-nohup ./pcds-server > ~/pcds-server/pcds-server.log 2>&1 &
-echo "Server started with PID $!"
+# put student_credentials.csv from provision_students.sh here (optional — you can also upload it in the page)
+nohup ./pcds.py > pcds.log 2>&1 &
 ```
 
-The server runs on port **2225** and is viewable in **aux2**.
+Open `http://<instructor-host>:2225` and log in as **instructor** / **alta3**. The server listens on all
+interfaces (`0.0.0.0:2225`).
 
----
+Options: `--csv PATH` (default `student_credentials.csv`), `--state PATH` (default `pcds_state.json`),
+`--port N` (default 2225).
 
-## Using the Dashboard
+## How it behaves
 
-Open the dashboard in aux2 at port 2225. You'll see a setup form before any students connect.
+- **Loading credentials.** At startup the server loads `student_credentials.csv` if it's there. You can also
+  load a CSV with **Upload CSV** or **Paste CSV** on the page. Loading a different CSV clears the used marks.
+- **Used marks** are saved in `pcds_state.json`, so they survive page refreshes and server restarts, and they
+  sync between open tabs. To un-gray one button, click its **unmark** link. To un-gray every button, use
+  **Clear all marks**. Clicking a grayed button copies its block again.
+- **What gets copied.** You get every CSV column as an `export`, plus `STUDENT_NUMBER`, which is taken from the
+  resource group name (`rg-student-07` → `07`). Pasting the block on a student machine:
+  1. removes any earlier PCDS block from `~/.bashrc`,
+  2. appends the new `export` lines between `# >>> PCDS >>>` / `# <<< PCDS <<<` markers,
+  3. loads the variables into the current shell.
 
-### 1. Add static variables
+  Every new terminal then has the variables. Pasting a different student's block replaces the old one.
 
-These are values that are **the same on every student machine** — things like a shared tenant ID, subscription ID, or region. Click **+ Add Variable** for each one and fill in the name and value.
-
-### 2. Paste your unique variables (CSV)
-
-These are values that **differ per student**. Values in the same row are always assigned together.
-
-Paste a CSV into the text area. The first row is headers (variable names); each subsequent row is one student's slot, assigned first-come first-served when a student runs the setup command.
-
-```
-ARM_CLIENT_ID,ARM_CLIENT_SECRET,ARM_RESOURCE_GROUP
-aaa-111,s3cr3t1,rg-student-01
-bbb-222,s3cr3t2,rg-student-02
-```
-
-<details>
-<summary><strong>Teaching the Terraform on Azure course? Click here for instructions on how to get this data and format it.</strong></summary>
-
-## Azure Student Environment Provisioner
-
-This script automates creating and tearing down per-student Azure resource groups for the Terraform Azure course.
-
-**What it does:**
-- Installs the Azure CLI if not already present
-- Walks you through authenticating to the Alta3 Azure account
-- Creates one resource group and scoped service principal per student, then writes credentials to a CSV
-- The generated CSV is what gets pasted into the PCDS dashboard
-
-**Run it on BCHD and follow the prompts:**
-
-```bash
-curl -fsSL https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh -o provision.sh
-bash provision.sh
-```
-
-At the end of the course, run the script again and select the `Delete` option to tear down all rg-student-* resource groups and any infrastructure students left behind.
-
-</details>
-
-### 3. Open the session
-
-Click **Save & Open for Students**. The page switches to the live roster view.
-
-### 4. Share the setup command with students
-
-The roster page displays the command students need to run. Copy it and share it with the class. Students run it once in their terminal, enter their name when prompted, and their environment is configured immediately and persists across future sessions.
-
----
-
-## Resetting
-
-To wipe all student assignments and clear the config (e.g. between class sessions), click the **✖ Reset** button in the roster view and confirm. The page returns to the setup form automatically.
-
-To fully stop the server:
-
-```bash
-pkill pcds-server
-```
-
----
-
-## Student Experience
-
-Students run one command:
-
-```bash
-source <(curl -s http://<INSTRUCTOR_FQDN>:2225/setup.sh)
-```
-
-They enter their name when prompted. Their shell is configured immediately and the variables persist in all future terminal sessions. If a student runs the command again (e.g. after a crash or reset), they receive the same credentials they were originally assigned.
-
----
-
-## Ports
-
-| Port | Purpose |
-|---|---|
-| 2225 | PCDS server — student config requests, instructor dashboard, and `setup.sh` distribution |
-| 8080 | nginx — no longer needed for PCDS |
-
----
-
-## API
-
-| Method | Path | Description |
-|---|---|---|
-| `GET`  | `/setup.sh`   | Student setup script with instructor FQDN pre-injected |
-| `POST` | `/get-config` | Student registration — returns `export` lines for the shell |
-| `GET` | `/roster` | Plain-text roster with slot usage (curl-friendly) |
-| `POST` | `/config` | Save instructor configuration |
-| `POST` | `/reset` | Wipe config and all student assignments |
-| `GET` | `/events` | Server-sent events stream (used by the dashboard) |
+`student_credentials.csv` and `pcds_state.json` contain service-principal secrets. Both are git-ignored, and
+the state file is written with mode 600.
