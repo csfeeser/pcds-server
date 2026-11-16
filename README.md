@@ -14,11 +14,11 @@ cd ~/pcds-server
 nohup ./pcds.py > pcds.log 2>&1 &
 ```
 
-Open `http://<instructor-host>:2225` and log in as **instructor** / **alta3**. The server listens on all
-interfaces (`0.0.0.0:2225`).
+Open `http://<instructor-host>:8092` and log in as **instructor** / **alta3**. The server listens on all
+interfaces (`0.0.0.0:8092`).
 
 Options: `--csv PATH` (default `student_credentials.csv`), `--state PATH` (default `pcds_state.json`),
-`--port N` (default 2225).
+`--port N` (default 8092).
 
 ## How it behaves
 

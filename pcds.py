@@ -27,7 +27,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 USERNAME = "instructor"
 PASSWORD = "alta3"
-DEFAULT_PORT = 2225
+DEFAULT_PORT = 8092
 MAX_UPLOAD_BYTES = 1024 * 1024
 
 BLOCK_START = "# >>> PCDS >>>"
