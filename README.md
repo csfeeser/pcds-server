@@ -1,11 +1,14 @@
 # PCDS — Student Credential Handout
 
-A single Python script (standard library only, Python 3.8+) that serves the Azure credentials created by
-[`provision_students.sh`](https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh)
-as a page with one button per student. Clicking a button copies a shell block to your clipboard and grays the
-button out, so you can see which ones you've already handed out. Paste the block into that student's terminal.
+First, run the following command to launch a script that will install Azure CLI and create Azure resource groups/principals. Make sure to create enough for every student:
 
-## Run it
+```
+curl -fsSL https://static.alta3.com/courses/terraform-azure/resources/provision_students.sh -o provision_students.sh && bash provision_students.sh
+```
+
+When finished, there will be a file `student_credentials.csv`.
+
+Then run the following:
 
 ```bash
 git clone https://github.com/csfeeser/pcds-server.git ~/pcds-server
@@ -14,7 +17,7 @@ cd ~/pcds-server
 nohup ./pcds.py > pcds.log 2>&1 &
 ```
 
-Open `http://<instructor-host>:8092` and log in as **instructor** / **alta3**. The server listens on all
+Open `aux2: 2225` and log in as **instructor** / **alta3**. The server listens on all
 interfaces (`0.0.0.0:8092`).
 
 Options: `--csv PATH` (default `student_credentials.csv`), `--state PATH` (default `pcds_state.json`),
